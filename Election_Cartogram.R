@@ -145,7 +145,7 @@ map1_sim <- ms_simplify(map1_json)
 map1_clipped <- ms_clip(map1_sim, bbox = c(-170, 15, -55, 72))
 
 # Save it to a local file system.
-geojson_write(map1_clipped, file = "JSON/map1.geojson")
+geojson_write(map1_clipped, file = "map1.geojson")
 
 #########################################
 ########write cartogram into geojson##########
@@ -162,10 +162,11 @@ map2_sim <- ms_simplify(map2_json)
 map2_clipped <- ms_clip(map2_sim, bbox = c(-170, 15, -55, 72))
 
 # Save it to a local file system.
-geojson_write(map2_clipped, file = "JSON/map2.geojson")
+geojson_write(map2_clipped, file = "map2.geojson")
 
 
 ######## Max's way to write cartogram into geojson##########
-write_sf(map2, dsn = "JSON/map2.geojson",delete_dsn=TRUE)#if detected a file delete it
+##Important! don'r put the JSONs in a separate folder
+write_sf(map2, dsn = "map2.geojson",delete_dsn=TRUE)#if detected a file delete it
 
-write_sf(map1, dsn = "JSON/map1.geojson",delete_dsn=TRUE)#if detected a file delete it
+write_sf(map1, dsn = "map1.geojson",delete_dsn=TRUE)#if detected a file delete it
