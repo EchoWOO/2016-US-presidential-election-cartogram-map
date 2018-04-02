@@ -20,34 +20,26 @@ var path = d3.geoPath()    // create a function to convert your map's coordinate
 var colorScale = d3.scaleSequential(d3.interpolateMagma)
     .domain([300,31000]);
 
-var map2 = d3.json("map2.geojson")
+    d3.json("map2.geojson", function(usa2) {
+        d3.json("map1.geojson", function (usa) {
 
-d3.json("map1.geojson", function(usa) {  //load the geojson file
+            var mymap = svg.selectAll("anything")  // For these purposes, what goes here is irrelevant
+                .data(usa.features) // The features from your geojson file
+                .enter().append("path").attr("d", path)
+                .style("fill", function (d) { // set the colors of each feature
+                    var percentage = d.properties.percentage; // You can reference any of your map's attributes in this way
+                    return colorScale(percentage);
+                });
 
-      // **** CREATE THE MAP ****
-      var mymap = svg.selectAll("anything")  // For these purposes, what goes here is irrelevant
-          .data(usa.features) // The features from your geojson file
-          .enter().append("path").attr("d", path)
-          .style("fill",function(d){ // set the colors of each feature
-              var percentage = d.properties.percentage; // You can reference any of your map's attributes in this way
-              return colorScale(percentage);
-          });
-
-          mymap.transition().duration(1000)
-          .styleTween(d3.json("map2.geojson"), function() {
-            var percentage = d.properties.percentage; // You can reference any of your map's attributes in this way
-            return colorScale(percentage); });
-
-          /*mymap.transition().duration(1000)
-          .styleTween("fill", function() {
-            var map2 = d3.json("map2.geojson")
-            var percentage = map2.properties.percentage; // You can reference any of your map's attributes in this way
-            return colorScale(percentage);
-          });
-          */
-
-
+            mymap
+                .data(usa2.features)
+                .transition().duration(5000).delay(5000)
+                .attr("d", path);
+    
+        });
     });
+
+
 
 /*
 d3.json("map1.geojson", function(error, usa) {  //load the geojson file
