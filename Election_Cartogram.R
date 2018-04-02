@@ -165,4 +165,7 @@ map2_clipped <- ms_clip(map2_sim, bbox = c(-170, 15, -55, 72))
 geojson_write(map2_clipped, file = "JSON/map2.geojson")
 
 
+######## Max's way to write cartogram into geojson##########
+write_sf(map2, dsn = "JSON/map2.geojson",delete_dsn=TRUE)#if detected a file delete it
 
+write_sf(map1, dsn = "JSON/map1.geojson",delete_dsn=TRUE)#if detected a file delete it
