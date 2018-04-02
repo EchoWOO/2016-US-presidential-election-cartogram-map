@@ -1,11 +1,14 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
+<div>
+  <h1>2016 US presidential election cartogram map</h1>
+</div>
 <svg></svg>
 <body>
 <script>
 
 var width = 960;
-var height = 500;
+var height = 700;
 
 var svg = d3.select("svg") // set the width, height and color of the background
     .attr("width", width)
@@ -35,7 +38,7 @@ var colorScale = d3.scaleSequential(d3.interpolateMagma)
                 .data(usa2.features)
                 .transition().duration(5000).delay(5000)
                 .attr("d", path);
-    
+
         });
     });
 

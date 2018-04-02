@@ -1,0 +1,30 @@
+body {
+    padding: 0;
+    overflow: hidden;
+    font-family: colfax, helvetica, arial, sans-serif;
+}
+
+p.main {
+  margin-left: 10px;
+  font-size: 18px;
+}
+
+p{
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+h1 {
+  margin-left: 10px;
+  font-size: 22px;
+  font-family: arial;
+}
+.legend {
+  position: absolute;
+  right: 10px;
+  width: 230px;
+  top: 10px;
+  height: 220px;
+  background-color: #efefef;
+  z-index: 2000;
+}
