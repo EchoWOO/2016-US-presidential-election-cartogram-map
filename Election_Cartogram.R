@@ -27,7 +27,7 @@ counties <- counties_sf()%>%
 ####% The same as the previous codes
 
 # **** 2016 Election Results ****(county level election results)
-election <- read.csv("D:/620/MUSA-620-Week-3-master/MUSA-620-Week-3-master/preselect16results.csv")
+election <- read.csv("preselect16results.csv")
 election <- filter(election,!is.na(county))  # remove all but the county-level data
 election <- mutate(election,fips=as.character(fips)) # make "fips" a string
 election <- mutate(election,fips = ifelse(nchar(fips)==4,paste0("0",fips),fips)) # add a leading "0" if it has a length of 4
@@ -64,67 +64,7 @@ myTheme <- function() {
     ) 
 }
 
-ggplot() +
-  geom_sf(data = elecjoin, aes(fill = lead), color = NA) +
-  scale_fill_manual(values = c('#cc3333', '#3333cc')) +
-  myTheme()
-
-
-
-# **** Set the projection (EPSG code) ****
-# Complete listing here: http://spatialreference.org/
-# 4326 - WGS 84 (standard lat,lng coordinates)
-# 3395 - Mercator
-# 102003 - Albers
-
-ggplot() +
-  geom_sf(data = elecjoin, aes(fill = lead), color = NA) +
-  scale_fill_manual(values = c('#cc3333', '#3333cc')) +
-  coord_sf(crs = st_crs(102003)) +
-  myTheme()
-
-
-
-# Display the county borders. Give the appearance of thinness using alpha.
-# Set labels
-# Set legend title
-
-ggplot() +
-  geom_sf(data = elecjoin, aes(fill = lead),
-          #color="white", size=0.000001) +           # you can only get so thin to illustrate
-          color = alpha("white",0.2), size=0.1) +    # appearance of thinness
-  scale_fill_manual(values = c('#cc3333', '#3333cc'),name = "Winner") +
-  coord_sf(crs = st_crs(102003)) +
-  labs(
-    title = 'Results of the 2016 Presidential Election',
-    subtitle = "Winning candidate in each U.S. county",
-    caption = "Source: Mark Kearney"
-  ) +
-  myTheme()
-
-#create a cartogram
-#export into shapefile
-st_transform(st_as_sf(elecjoin),crs = 4326) %>%
-  st_write("election-map1.shp", driver = "ESRI Shapefile")
-#import the cartogram
-cartogram <- st_read('C:/Users/dell/Documents/election-map1.shp', stringsAsFactors = FALSE)
-st_crs(cartogram) = 4326
-#display the cartogram
-ggplot() +
-  geom_sf(data = cartogram, aes(fill = lead),
-          #color="white", size=0.000001) +           # you can only get so thin to illustrate
-          color = alpha("white",0.2), size=0.1) +    # appearance of thinness
-  scale_fill_manual(values = c('#cc3333', '#3333cc'),name = "Winner") +
-  #coord_sf(crs = st_crs(102003)) +
-  labs(
-    title = 'Results of the 2016 Presidential Election',
-    subtitle = "Winning candidate in each U.S. county",
-    caption = "Source: Mark Kearney"
-  ) +
-  myTheme()
-
-#Set to continuous map
-head(elecjoin)
+###assignment
 #Set a continuous variable for displaying the 
 marginofvictory <- mutate(elecjoin, percentage = Hillary.Clinton - Donald.Trump)
 head(marginofvictory)
@@ -152,17 +92,13 @@ ggplot() +
 
 # to create a carto map
 st_transform(st_as_sf(marginofvictory),crs = 4326) %>%
-  st_write("election-map3.shp", driver = "ESRI Shapefile")
+  st_write("shapefile/election-map.shp", driver = "ESRI Shapefile")
+
 #create a cartogram
-
 #import the cartogram
-cartogram <- st_read('C:/Users/dell/Documents/620Class3/election-cartogram1.shp', stringsAsFactors = FALSE)
+cartogram <- st_read('shapefile/election-cartogram1.shp', stringsAsFactors = FALSE)
 st_crs(cartogram) = 4326
-
-cartogram <- st_read('election-cartogram.shp', stringsAsFactors = FALSE)
-st_crs(cartogram) = 4326
-
-#alpha("white",0.8) #is to set the transparency of the boundary lines
+#alpha #is to set the transparency of the boundary lines
 
 # Plot cartogram using geom_sf()
 ggplot() +
@@ -185,6 +121,48 @@ ggplot() +
     panel.grid.major = element_line(color = "white")
   )
 
+
+################################################
+########write electionmap into geojson##########
+#About how to convert shapefile to JSON: 
+#https://blog.exploratory.io/creating-geojson-out-of-shapefile-in-r-40bc0005857d
+
+library(rgdal)
+library(geojsonio)
+library(spdplyr)
+library(rmapshaper)
+
+map1 <- dplyr::select(marginofvictory,fips,percentage,geometry) %>% 
+  rename(FIPS = fips)
+
+# Convert SP Data Frame to GeoJSON.
+map1_json <- geojson_json(map1)
+
+# Simplify the geometry information of GeoJSON.
+map1_sim <- ms_simplify(map1_json)
+
+# Keep only the polygons inside the bbox (boundary box).
+map1_clipped <- ms_clip(map1_sim, bbox = c(-170, 15, -55, 72))
+
+# Save it to a local file system.
+geojson_write(map1_clipped, file = "JSON/map1.geojson")
+
+#########################################
+########write cartogram into geojson##########
+map2 <- dplyr::select(cartogram,fips,percntg,geometry) %>% 
+  rename(FIPS = fips, percentage = percntg)
+
+# Convert SP Data Frame to GeoJSON.
+map2_json <- geojson_json(map2)
+
+# Simplify the geometry information of GeoJSON.
+map2_sim <- ms_simplify(map2_json)
+
+# Keep only the polygons inside the bbox (boundary box).
+map2_clipped <- ms_clip(map2_sim, bbox = c(-170, 15, -55, 72))
+
+# Save it to a local file system.
+geojson_write(map2_clipped, file = "JSON/map2.geojson")
 
 
 
